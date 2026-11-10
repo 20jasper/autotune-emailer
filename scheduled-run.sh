@@ -1,8 +1,4 @@
 #!/usr/bin/env bash
-#
-# Run Autotune, then email the report (or the failure log).
-# This is what the systemd timer / cron entry calls.
-#
 set -u
 
 cd "$(dirname "$0")" || exit 1

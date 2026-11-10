@@ -1,5 +1,3 @@
-"""Small helpers for reading the project's .env file."""
-
 from __future__ import annotations
 
 import os
@@ -10,7 +8,6 @@ Env = dict[str, str]
 
 
 def load_env(path: Path) -> Env:
-    """Parse a simple KEY=value .env file without executing it."""
     values: Env = {}
     if not path.exists():
         return values
@@ -42,7 +39,6 @@ def load_env(path: Path) -> Env:
 
 
 def setting(env: Env, key: str, default: str = "") -> str:
-    """Process environment wins, then .env, then the default."""
     return os.environ.get(key) or env.get(key) or default
 
 

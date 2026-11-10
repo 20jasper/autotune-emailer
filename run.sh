@@ -1,12 +1,4 @@
 #!/usr/bin/env bash
-#
-# Run the existing nightscout-autotune container against your Nightscout.
-# The wrapper only:
-#   * loads .env
-#   * hashes a plain API secret (the image expects the SHA1 hash)
-#   * mounts a temp directory so the raw Nightscout data is not left behind
-#   * copies the HTML/text report into ./reports
-#
 set -euo pipefail
 
 cd "$(dirname "$0")"
@@ -17,7 +9,6 @@ if [ ! -f .env ]; then
 fi
 
 set -a
-# shellcheck disable=SC1091
 . ./.env
 set +a
 
@@ -67,14 +58,11 @@ UAM="${UAM_AS_BASAL:-false}"
 TZ_VALUE="${TZ:-Etc/UTC}"
 HTML="${HTML_EXPORT:-true}"
 
-# The upstream image has no timezone database, so TZ is ignored and Autotune
-# runs in UTC. Build a tiny local image that adds tzdata.
 if [ "${REBUILD_IMAGE:-false}" = "true" ] || ! "$ENGINE" image inspect "$IMAGE" >/dev/null 2>&1; then
   echo "Building local image $IMAGE (adds timezone data to the upstream image)..."
   "$ENGINE" build --build-arg "BASE_IMAGE=$BASE_IMAGE" -t "$IMAGE" .
 fi
 
-# On SELinux hosts (e.g. Fedora) the bind mount needs a relabel suffix.
 VOLUME_SUFFIX=""
 if command -v getenforce >/dev/null 2>&1 && [ "$(getenforce 2>/dev/null || true)" != "Disabled" ]; then
   VOLUME_SUFFIX=":Z"

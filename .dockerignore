@@ -2,7 +2,6 @@
 .git
 .opencode
 reports
-spike
 node_modules
 .venv
 __pycache__

@@ -1,14 +1,4 @@
 #!/usr/bin/env python3
-"""Email the latest Nightscout Autotune report.
-
-Uses only the Python standard library. Configuration is read from .env (or
-the process environment) so it works both manually and from systemd/cron.
-
-Usage:
-    python3 send_report.py                  # send success/failure based on files
-    python3 send_report.py --status 1       # force a failure email
-    python3 send_report.py --dry-run        # write reports/email-preview.eml
-"""
 
 from __future__ import annotations
 
@@ -252,7 +242,6 @@ def main() -> int:
 
     env = load_env(ENV_FILE)
     if args.dry_run:
-        # A preview does not need real SMTP settings.
         if not env.get("SMTP_HOST"):
             env["SMTP_HOST"] = "preview"
         if not env.get("SMTP_FROM"):

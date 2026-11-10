@@ -2,8 +2,6 @@
 reports/*
 !reports/.gitkeep
 
-# Local experiments and generated files
-spike/
 .opencode/
 node_modules/
 .venv/
