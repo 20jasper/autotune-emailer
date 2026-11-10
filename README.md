@@ -342,6 +342,7 @@ uv sync
 uv run ruff check .
 uv run ruff format --check .
 uv run mypy
+uvx --from shellcheck-py shellcheck run.sh scheduled-run.sh
 ```
 
 Use `uv run ruff format .` to apply formatting. The tool versions are pinned in `uv.lock`.
