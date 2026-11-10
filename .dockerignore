@@ -9,6 +9,7 @@ __pycache__
 .ruff_cache
 pyproject.toml
 uv.lock
+.python-version
 *.pyc
 *.eml
 *.log

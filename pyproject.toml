@@ -2,7 +2,7 @@
 name = "nightscout-autotune-tools"
 version = "0.1.0"
 description = "Typed Python helpers for the self-hosted Nightscout Autotune wrapper"
-requires-python = ">=3.10"
+requires-python = ">=3.14"
 dependencies = []
 
 [dependency-groups]
@@ -15,14 +15,14 @@ dev = [
 package = false
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py314"
 line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.14"
 strict = true
-files = ["app_password.py", "env_file.py", "send_report.py"]
+files = ["send_report.py"]
 warn_unused_ignores = true
