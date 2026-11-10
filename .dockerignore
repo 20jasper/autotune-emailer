@@ -1,0 +1,15 @@
+.env
+.git
+.opencode
+reports
+spike
+node_modules
+.venv
+__pycache__
+.mypy_cache
+.ruff_cache
+pyproject.toml
+uv.lock
+*.pyc
+*.eml
+*.log

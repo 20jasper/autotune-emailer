@@ -1,0 +1,11 @@
+[Unit]
+Description=Nightscout Autotune weekly run
+Documentation=file://%h/coding/autotune/README.md
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/coding/autotune
+ExecStart=%h/coding/autotune/scheduled-run.sh
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=XDG_RUNTIME_DIR=/run/user/%U
+TimeoutStartSec=45min

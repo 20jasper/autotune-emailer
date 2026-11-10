@@ -1,0 +1,11 @@
+[Unit]
+Description=Weekly Nightscout Autotune
+
+[Timer]
+OnCalendar=Sun 04:30
+Persistent=true
+RandomizedDelaySec=20m
+Unit=nightscout-autotune.service
+
+[Install]
+WantedBy=timers.target
