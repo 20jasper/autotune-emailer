@@ -24,5 +24,5 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 [tool.mypy]
 python_version = "3.14"
 strict = true
-files = ["send_report.py"]
+files = ["cgm_stats.py", "send_report.py"]
 warn_unused_ignores = true

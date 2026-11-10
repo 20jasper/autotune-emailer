@@ -46,6 +46,7 @@ def main() -> int:
     text = read(REPORTS / "autotune_recommendations.log")
     html = read(REPORTS / "autotune_recommendations.html")
     profile = read(REPORTS / "tuned-profile.json")
+    stats = read(REPORTS / "cgm-stats.txt")
     log = read(REPORTS / "last-run.log")
     failed = status != 0 or not text
 
@@ -73,7 +74,7 @@ def main() -> int:
                 filename="autotune-last-run.log",
             )
     else:
-        message.set_content(text)
+        message.set_content(text + ("\n\n" + stats if stats else ""))
         if html:
             message.add_attachment(
                 html.encode("utf-8"),
@@ -87,6 +88,13 @@ def main() -> int:
                 maintype="application",
                 subtype="json",
                 filename="tuned-profile.json",
+            )
+        if stats:
+            message.add_attachment(
+                stats.encode("utf-8"),
+                maintype="text",
+                subtype="plain",
+                filename="cgm-stats.txt",
             )
 
     try:
