@@ -5,6 +5,7 @@ import smtplib
 import ssl
 import sys
 from email.message import EmailMessage
+from html import escape
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -44,7 +45,7 @@ def main() -> int:
     status = int(sys.argv[1]) if len(sys.argv) > 1 else 0
     env = load_env(ROOT / ".env")
     text = read(REPORTS / "autotune_recommendations.log")
-    html = read(REPORTS / "autotune_recommendations.html")
+    html_report = read(REPORTS / "autotune_recommendations.html")
     profile = read(REPORTS / "tuned-profile.json")
     stats = read(REPORTS / "cgm-stats.txt")
     log = read(REPORTS / "last-run.log")
@@ -75,9 +76,18 @@ def main() -> int:
             )
     else:
         message.set_content(text + ("\n\n" + stats if stats else ""))
-        if html:
+        if html_report:
+            report = html_report
+            if stats:
+                block = f"<h2>CGM stats</h2><pre>{escape(stats)}</pre>"
+                report = (
+                    report.replace("</body>", block + "</body>", 1)
+                    if "</body>" in report
+                    else report + block
+                )
+            message.add_alternative(report, subtype="html")
             message.add_attachment(
-                html.encode("utf-8"),
+                html_report.encode("utf-8"),
                 maintype="text",
                 subtype="html",
                 filename="autotune_recommendations.html",
