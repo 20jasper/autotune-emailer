@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 
-from __future__ import annotations
-
 import re
 import smtplib
 import ssl
 import sys
-from contextlib import suppress
 from email.message import EmailMessage
 from pathlib import Path
 
@@ -33,40 +30,14 @@ def load_env(path: Path) -> dict[str, str]:
 
 
 def read(path: Path) -> str:
-    try:
-        return path.read_text(encoding="utf-8")
-    except OSError:
-        return ""
+    return path.read_text(encoding="utf-8") if path.exists() else ""
 
 
-def truthy(value: str) -> bool:
-    return value.strip().lower() in {"1", "true", "yes", "on"}
-
-
-def send(env: dict[str, str], message: EmailMessage) -> None:
-    host = env.get("SMTP_HOST", "")
-    port = int(env.get("SMTP_PORT", "587"))
-    user = env.get("SMTP_USER", "")
-    password = re.sub(r"\s+", "", env.get("SMTP_PASS", ""))
-    use_ssl = truthy(env.get("SMTP_SSL", "false"))
-    use_starttls = truthy(env.get("SMTP_STARTTLS", "true")) and not use_ssl
-    context = ssl.create_default_context()
-
-    server: smtplib.SMTP
-    if use_ssl:
-        server = smtplib.SMTP_SSL(host, port, timeout=30, context=context)
-    else:
-        server = smtplib.SMTP(host, port, timeout=30)
-        if use_starttls:
-            server.starttls(context=context)
-
-    try:
-        if user:
-            server.login(user, password)
+def send(host: str, port: int, user: str, password: str, message: EmailMessage) -> None:
+    with smtplib.SMTP(host, port, timeout=30) as server:
+        server.starttls(context=ssl.create_default_context())
+        server.login(user, re.sub(r"\s+", "", password))
         server.send_message(message)
-    finally:
-        with suppress(Exception):
-            server.quit()
 
 
 def main() -> int:
@@ -78,14 +49,19 @@ def main() -> int:
     log = read(REPORTS / "last-run.log")
     failed = status != 0 or not text
 
-    if not env.get("SMTP_HOST") or not env.get("SMTP_TO") or not env.get("SMTP_FROM"):
+    user = env.get("SMTP_USER", "")
+    password = env.get("SMTP_PASS", "")
+    to = env.get("SMTP_TO", "")
+    sender = env.get("SMTP_FROM") or user
+
+    if not user or not password or not to or not sender:
         print("Email is not configured.")
         return 0
 
     message = EmailMessage()
     message["Subject"] = "Nightscout Autotune failed" if failed else "Nightscout Autotune report"
-    message["From"] = env["SMTP_FROM"]
-    message["To"] = env["SMTP_TO"]
+    message["From"] = sender
+    message["To"] = to
 
     if failed:
         message.set_content("Autotune failed.\n\n" + "\n".join(log.splitlines()[-40:]))
@@ -114,7 +90,13 @@ def main() -> int:
             )
 
     try:
-        send(env, message)
+        send(
+            env.get("SMTP_HOST", "smtp.gmail.com"),
+            int(env.get("SMTP_PORT", "587")),
+            user,
+            password,
+            message,
+        )
     except Exception as error:
         print(f"Email failed: {error}")
         return 1
